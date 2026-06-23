@@ -1,0 +1,14 @@
+- generic [ref=e4]:
+  - img [ref=e5]
+  - generic [ref=e8]:
+    - generic [ref=e9]: 账号登录
+    - generic [ref=e11] [cursor=pointer]:
+      - generic:
+        - combobox [ref=e13]
+        - generic [ref=e14]: 测试学校
+      - img [ref=e43]
+    - textbox "请输入账号" [ref=e19]: QATEST001
+    - textbox "请输入密码" [ref=e21]: WRONG_PASSWORD_X
+    - generic [ref=e45] [cursor=pointer]: 登录
+    - generic [ref=e23]: 登录即代表阅读并同意《服务协议与隐私政策》
+    - generic [ref=e25] [cursor=pointer]: 跳转教师端

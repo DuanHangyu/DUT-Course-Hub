@@ -1,0 +1,7 @@
+[    2525ms] [VERBOSE] [DOM] Password field is not contained in a form: (More info: https://goo.gl/9p2vKq) %o @ https://learn.deepolylink.com/login:0
+[    7444ms] NetworkError: Failed to execute 'importScripts' on 'WorkerGlobalScope': The script at 'https://sre//speech-worker.js' failed to load.
+    at blob:https://learn.deepolylink.com/c9922db2-bafc-437b-a963-b8dc24d7ffcd:3:7
+[  225706ms] ReferenceError: getCode is not defined
+    at https://learn.deepolylink.com/assets/index-Qs4puvWk.js:1:7960
+[10525342ms] [ERROR] Failed to load resource: net::ERR_TIMED_OUT @ https://digital-human-new.oss-cn-beijing.aliyuncs.com/digital/2026/03/22/f05fe3a15db9473f84f8d40149590fc2.png?Expires=1781915377&OSSAccessKeyId=LTAI5tHabLDof9LHnWmmjY3t&Signature=5Q0InU6pG6%2B0fb9PRJb%2Bg2FPYE0%3D:0
+[10532252ms] [ERROR] Failed to load resource: net::ERR_TUNNEL_CONNECTION_FAILED @ https://digital-human-new.oss-cn-beijing.aliyuncs.com/digital/2026/03/22/4b08096c011440378b2e9a98f21d3789.png?Expires=1781915378&OSSAccessKeyId=LTAI5tHabLDof9LHnWmmjY3t&Signature=cfiTnjRsv%2Bj0Ym2AIDn6u8h5aeQ%3D:0

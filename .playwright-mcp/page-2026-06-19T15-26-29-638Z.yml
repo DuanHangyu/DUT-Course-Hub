@@ -1,0 +1,43 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - generic [ref=e4]:
+      - generic [ref=e6]:
+        - generic [ref=e7] [cursor=pointer]:
+          - img [ref=e8]
+          - generic [ref=e10]: 数据概览
+        - generic [ref=e11] [cursor=pointer]:
+          - img [ref=e12]
+          - generic [ref=e14]: 课程建设
+        - generic [ref=e15] [cursor=pointer]:
+          - img [ref=e16]
+          - generic [ref=e18]: 中学管理
+        - generic [ref=e19] [cursor=pointer]:
+          - img [ref=e20]
+          - generic [ref=e22]: 首页配置
+      - generic [ref=e25] [cursor=pointer]:
+        - generic [ref=e26]: 大学端（总部）
+        - img [ref=e27]
+    - generic [ref=e29]:
+      - generic [ref=e112]:
+        - generic [ref=e113]:
+          - img [ref=e114]
+          - generic [ref=e116]: 课程详情
+        - generic [ref=e117]:
+          - generic [ref=e118]: 管理员
+          - img [ref=e119]
+      - generic [ref=e359]:
+        - generic [ref=e360]:
+          - button "left 返回" [ref=e361] [cursor=pointer]:
+            - img "left" [ref=e362]:
+              - img [ref=e363]
+            - generic [ref=e365]: 返回
+          - generic [ref=e367]: 当前课程：
+        - generic [ref=e369]:
+          - button "新增节点" [ref=e370] [cursor=pointer]:
+            - generic [ref=e371]: 新增节点
+          - generic [ref=e372]:
+            - generic [ref=e377]:
+              - generic:
+                - img
+            - generic [ref=e383]: 长按鼠标拖动画布；操作鼠标滚动缩放
+  - img

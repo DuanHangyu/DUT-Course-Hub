@@ -1,0 +1,8 @@
+[    2327ms] [VERBOSE] [DOM] Password field is not contained in a form: (More info: https://goo.gl/9p2vKq) %o @ https://learn.deepolylink.com/login?redirect=/home:0
+[    3484ms] [LOG] errAxiosError: Network Error @ https://learn.deepolylink.com/assets/index-DXa97hZ9.js:35
+[    3487ms] [ERROR] Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID @ https://digital-student-test.hotsupper.top/digital/allSchool:0
+[    3489ms] AxiosError: Network Error
+    at xe.onerror (https://learn.deepolylink.com/assets/index-DXa97hZ9.js:33:7277)
+    at Axios$1.request (https://learn.deepolylink.com/assets/index-DXa97hZ9.js:35:2622)
+[    7077ms] NetworkError: Failed to execute 'importScripts' on 'WorkerGlobalScope': The script at 'https://sre//speech-worker.js' failed to load.
+    at blob:https://learn.deepolylink.com/cc0f8184-08e4-44dc-9d4e-6dfa57b310bf:3:7

@@ -1,0 +1,105 @@
+- generic [ref=e3]:
+  - generic [ref=e45]:
+    - generic [ref=e46]:
+      - button "岳鸿宇" [ref=e50] [cursor=pointer]:
+        - generic [ref=e51]: 岳鸿宇
+        - img [ref=e53]
+      - generic [ref=e55]:
+        - button "上一张幻灯片" [ref=e56] [cursor=pointer]:
+          - img [ref=e58]
+        - button "下一张幻灯片" [ref=e60] [cursor=pointer]:
+          - img [ref=e62]
+        - list [ref=e69]:
+          - listitem [ref=e70] [cursor=pointer]:
+            - button "幻灯片切换至索引 1" [ref=e71]
+          - listitem [ref=e72] [cursor=pointer]:
+            - button "幻灯片切换至索引 2" [ref=e73]
+          - listitem [ref=e74] [cursor=pointer]:
+            - button "幻灯片切换至索引 3" [ref=e75]
+          - listitem [ref=e76] [cursor=pointer]:
+            - button "幻灯片切换至索引 4" [ref=e77]
+    - generic [ref=e78]:
+      - generic [ref=e79]: 精选课程
+      - main [ref=e80]:
+        - generic [ref=e85]:
+          - generic [ref=e86]:
+            - generic [ref=e89]: 无人航行器设计实践（入门）
+            - generic [ref=e90]: 面向初学者，通过航行器认知、结构设计、加工制作、测控系统调试等实践，从0到1创造出一艘属于自己的无人船，以竞速赛检验实践成果，为后续学习过程建立知识储备、技能基础。
+            - generic [ref=e92]: 杨璐嘉，李航
+          - generic [ref=e94]:
+            - generic [ref=e97]: 无人机系统设计与开发实战--初级
+            - generic [ref=e98]: 本无人机课程涵盖认知、组装、飞控编程、传感器、自动控制、遥控通信、试飞调试及 AI 拓展 9 大模块，共 72 个知识点。理论结合实操，从基础入门到进阶应用，助你系统掌握无人机技术，开启智能飞行之旅。
+            - generic [ref=e100]: 李胜铭
+          - generic [ref=e102]:
+            - generic [ref=e105]: 人工智能通识
+            - generic [ref=e106]: 这门 AI 通识课面向零基础学习者，系统讲解人工智能的基本概念、发展历程与核心技术，涵盖机器学习、大模型、数据伦理等关键内容。课程兼顾理论与应用，用通俗语言拆解复杂原理，帮助学员建立 AI 认知框架，理解 AI 在生活、学习与工作中的价值，提升数字素养与未来竞争力。
+            - generic [ref=e108]: 郭艳卿
+          - generic [ref=e110]:
+            - generic [ref=e113]: 计算机视觉
+            - generic [ref=e114]: 计算机视觉与深度学习基础
+            - generic [ref=e116]: 王立君
+          - generic [ref=e118]:
+            - generic [ref=e121]: 自然语言处理
+            - generic [ref=e122]: 自然语言处理( Natural Language Processing, NLP)是人工智能领域的重要研究方向, 融合了语言学、计算机科学、机器学习、数学、认知心理学等多个学科领域的知识，是一门集计算机科学、人工智能和语言学于一体的交叉学科，它包含自然语言理解和自然语言生成两个主要方面, 研究内容包括字、词、短语、句子、段落和篇章等多种层次，是机器语言和人类语言之间沟通的桥梁。
+            - generic [ref=e124]: 林鸿飞
+          - generic [ref=e126]:
+            - generic [ref=e129]: 模式识别与机器学习-PRML
+            - generic [ref=e130]: 模式识别与机器学习-PRML
+            - generic [ref=e132]: 李祎
+    - generic [ref=e134]:
+      - generic [ref=e135]: 全部课程
+      - generic [ref=e137]:
+        - generic [ref=e139]:
+          - img [ref=e142] [cursor=pointer]
+          - img [ref=e146] [cursor=pointer]
+          - tablist [ref=e149]:
+            - tab "全部" [selected] [ref=e150]
+            - tab "人工智能" [ref=e151]
+            - tab "自然语言处理" [ref=e152]
+            - tab "计算机视觉" [ref=e153]
+            - tab "强化学习" [ref=e154]
+            - tab "嵌入式开发，人工智能" [ref=e155]
+            - tab "嵌入式开发,人工智能" [ref=e156]
+        - generic:
+          - tabpanel "全部"
+      - main [ref=e157]:
+        - generic [ref=e160]:
+          - generic [ref=e162]:
+            - generic [ref=e163]:
+              - generic [ref=e166]: 无人航行器设计实践（入门）
+              - generic [ref=e167]: 面向初学者，通过航行器认知、结构设计、加工制作、测控系统调试等实践，从0到1创造出一艘属于自己的无人船，以竞速赛检验实践成果，为后续学习过程建立知识储备、技能基础。
+              - generic [ref=e169]: 杨璐嘉，李航
+            - generic [ref=e171]:
+              - generic [ref=e174]: 无人机系统设计与开发实战--初级
+              - generic [ref=e175]: 本无人机课程涵盖认知、组装、飞控编程、传感器、自动控制、遥控通信、试飞调试及 AI 拓展 9 大模块，共 72 个知识点。理论结合实操，从基础入门到进阶应用，助你系统掌握无人机技术，开启智能飞行之旅。
+              - generic [ref=e177]: 李胜铭
+            - generic [ref=e179]:
+              - generic [ref=e182]: 人工智能通识
+              - generic [ref=e183]: 这门 AI 通识课面向零基础学习者，系统讲解人工智能的基本概念、发展历程与核心技术，涵盖机器学习、大模型、数据伦理等关键内容。课程兼顾理论与应用，用通俗语言拆解复杂原理，帮助学员建立 AI 认知框架，理解 AI 在生活、学习与工作中的价值，提升数字素养与未来竞争力。
+              - generic [ref=e185]: 郭艳卿
+            - generic [ref=e187]:
+              - generic [ref=e190]: 人工智能程序设计
+              - generic [ref=e191]: 人工智能程序设计（Artificial Intelligence Programming Design）。从变量、数据类型与运算符等基础规则，到列表、字典、集合等高级数据结构，再到函数、类与对象、异常处理等程序设计精髓，逐层深入。课程兼顾语法精讲与编程实践，适合编程初学者，帮助你掌握Python编程的关键技术，为后续的智能算法实现与系统开发打下坚实基础。
+              - generic [ref=e193]: 刘洋
+          - generic [ref=e196]:
+            - generic [ref=e197]:
+              - generic [ref=e200]: 生成式人工智能与大语言模型
+              - generic [ref=e201]: 本课程聚焦当前人工智能领域最前沿的生成式AI技术与大语言模型，系统介绍大模型的基本原理、架构设计与应用实践。课程内容涵盖Transformer架构、预训练与微调技术、提示工程、多模态融合、模型评估与对齐等核心知识，并探讨大模型在各行业的创新应用与伦理挑战。通过理论讲解与实践项目相结合的教学方式，学生将掌握大模型开发与应用的关键技能，能够设计、训练和优化
+              - generic [ref=e203]: 贾旭
+            - generic [ref=e205]:
+              - generic [ref=e208]: 强化学习
+              - generic [ref=e209]: 强化学习（Reinforcement Learning，RL），本课程带你探索智能体通过与环境交互自主学习的核心逻辑。从马尔可夫决策过程到Q - learning、策略梯度等经典算法，结合游戏AI等案例，解析"试错-奖励"机制如何驱动智能体优化决策。课程兼顾理论推导与编程实践，适合AI入门者及研究者，帮助你掌握让机器自主进化的关键技术，解锁智能系统设计新视角！
+              - generic [ref=e211]: 刘洋
+            - generic [ref=e213]:
+              - generic [ref=e216]: 计算机视觉
+              - generic [ref=e217]: 计算机视觉与深度学习基础
+              - generic [ref=e219]: 王立君
+            - generic [ref=e221]:
+              - generic [ref=e224]: 自然语言处理
+              - generic [ref=e225]: 自然语言处理( Natural Language Processing, NLP)是人工智能领域的重要研究方向, 融合了语言学、计算机科学、机器学习、数学、认知心理学等多个学科领域的知识，是一门集计算机科学、人工智能和语言学于一体的交叉学科，它包含自然语言理解和自然语言生成两个主要方面, 研究内容包括字、词、短语、句子、段落和篇章等多种层次，是机器语言和人类语言之间沟通的桥梁。
+              - generic [ref=e227]: 林鸿飞
+          - generic [ref=e231]:
+            - generic [ref=e234]: 模式识别与机器学习-PRML
+            - generic [ref=e235]: 模式识别与机器学习-PRML
+            - generic [ref=e237]: 李祎
+  - generic [ref=e253]: 版权所有：大连理工大学 地址：中国·辽宁省大连市甘井子区凌工路2号 电话：0411-84708320 邮编：116024 辽ICP备05001357号

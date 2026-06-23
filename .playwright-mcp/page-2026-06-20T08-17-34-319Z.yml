@@ -1,0 +1,49 @@
+- generic [ref=e3]:
+  - generic [ref=e4]:
+    - generic [ref=e5]:
+      - button "QA测试学生" [ref=e9] [cursor=pointer]:
+        - generic [ref=e10]: QA测试学生
+        - img [ref=e12]
+      - generic [ref=e15]:
+        - generic [ref=e16]: 测试黑屏课程
+        - generic [ref=e17]: 测试黑屏课程
+      - generic [ref=e22]:
+        - generic [ref=e24]:
+          - generic [ref=e25]: 授课老师：
+          - generic [ref=e26]: 梁老师
+        - generic [ref=e28]:
+          - generic [ref=e29]: 课程节点：
+          - generic [ref=e30]: "48"
+        - generic [ref=e32]:
+          - generic [ref=e33]: 发布时间：
+          - generic [ref=e34]: 2026-04-07 16:43
+        - generic [ref=e36]:
+          - generic [ref=e37]: 课程分类：
+          - generic [ref=e38]: 物理
+    - generic [ref=e39]:
+      - generic [ref=e40]: Knowledge Graphs
+      - generic [ref=e41]: 知识图谱
+      - generic [ref=e42]: 可视化知识结构，助力高效学习
+      - generic [ref=e43]:
+        - generic [ref=e44]:
+          - generic [ref=e45] [cursor=pointer]: 图谱视图
+          - generic [ref=e46] [cursor=pointer]: 列表视图
+        - generic [ref=e204] [cursor=pointer]: 全局资料库
+    - generic [ref=e206]:
+      - generic [ref=e207]:
+        - generic [ref=e210]: 模块化学习
+        - generic [ref=e211]: 知识图谱拆解内容为模块，以闯关形式学习，可自主选择模块，提升效率与知识留存。
+      - generic [ref=e212]:
+        - generic [ref=e215]: AI数字人导师
+        - generic [ref=e216]: AI 交互塑造数字人，依算法推送内容、答疑，助学习者培养自主学习与批判性思维。
+      - generic [ref=e217]:
+        - generic [ref=e220]: 动态路径解锁
+        - generic [ref=e221]: 三大引擎结合，根据评测动态调整学习路径，打造以学习者为中心的沉浸式体验。
+    - generic [ref=e224]:
+      - generic [ref=e225]:
+        - generic [ref=e227]: 课程评论
+        - generic [ref=e229]: 共 0 条评论
+      - generic [ref=e230]:
+        - generic [ref=e231] [cursor=pointer]: 我要评论
+        - generic [ref=e233] [cursor=pointer]: 查看全部评论
+  - generic [ref=e237]: 版权所有：大连理工大学 地址：中国·辽宁省大连市甘井子区凌工路2号 电话：0411-84708320 邮编：116024 辽ICP备05001357号

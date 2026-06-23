@@ -1,0 +1,49 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - generic [ref=e4]:
+      - generic [ref=e6]:
+        - generic [ref=e7] [cursor=pointer]:
+          - img [ref=e8]
+          - generic [ref=e10]: 数据概览
+        - generic [ref=e11] [cursor=pointer]:
+          - img [ref=e12]
+          - generic [ref=e14]: 课程建设
+        - generic [ref=e15] [cursor=pointer]:
+          - img [ref=e16]
+          - generic [ref=e18]: 中学管理
+        - generic [ref=e19] [cursor=pointer]:
+          - img [ref=e20]
+          - generic [ref=e22]: 首页配置
+      - generic [ref=e24] [cursor=pointer]: 收起面板
+      - generic [ref=e25] [cursor=pointer]:
+        - generic [ref=e26]: 大学端（总部）
+        - img [ref=e27]
+    - generic [ref=e31]:
+      - generic [ref=e34]:
+        - generic [ref=e35]: 管理员
+        - img [ref=e36]
+      - generic [ref=e38]:
+        - generic [ref=e66]:
+          - generic [ref=e67]:
+            - generic [ref=e68]: "1"
+            - generic [ref=e69]: 当前活跃学生
+          - generic [ref=e70]:
+            - generic [ref=e71]: "6"
+            - generic [ref=e72]: 当前活跃学校
+          - generic [ref=e73]:
+            - generic [ref=e74]: "29"
+            - generic [ref=e75]: 当前覆盖课程
+        - generic [ref=e87]:
+          - generic [ref=e88]:
+            - generic [ref=e89]: "6"
+            - generic [ref=e90]: 覆盖学校数
+          - generic [ref=e91]:
+            - generic [ref=e92]: "214"
+            - generic [ref=e93]: 累计服务学生数
+          - generic [ref=e94]:
+            - generic [ref=e95]: "31"
+            - generic [ref=e96]: 累计精品课程数
+          - generic [ref=e97]:
+            - generic [ref=e98]: "0"
+            - generic [ref=e99]: AI算力消耗总量
+  - img

@@ -1,0 +1,3 @@
+[    1501ms] [LOG] send heartbeat @ https://learn.deepolylink.com/assets/index-C3DW5Yex.js:112
+[   14715ms] NetworkError: Failed to execute 'importScripts' on 'WorkerGlobalScope': The script at 'https://sre//speech-worker.js' failed to load.
+    at blob:https://learn.deepolylink.com/88377842-758d-4933-9d6f-dedb51c3f889:3:7
