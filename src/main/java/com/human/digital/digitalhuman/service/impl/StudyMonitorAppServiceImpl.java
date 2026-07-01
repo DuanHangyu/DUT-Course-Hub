@@ -178,22 +178,19 @@ public class StudyMonitorAppServiceImpl implements StudyMonitorAppService {
     public ProgressTrendDTO getProgressTrend(Long courseId, Long teacherId) {
         checkPermission(courseId, teacherId);
 
-        List<StudyProgressSnapshotPO> snapshots = studyProgressSnapshotService.listByCourseIdAndDate(courseId, LocalDate.now());
-
-        List<TrendPointDTO> trends = snapshots.stream()
-                .collect(Collectors.groupingBy(StudyProgressSnapshotPO::getSnapshotDate))
-                .entrySet().stream()
-                .map(entry -> {
-                    BigDecimal avg = entry.getValue().stream()
-                            .map(StudyProgressSnapshotPO::getProgress)
-                            .reduce(BigDecimal.ZERO, BigDecimal::add)
-                            .divide(BigDecimal.valueOf(entry.getValue().size()), 2, RoundingMode.HALF_UP);
-                    return new TrendPointDTO(entry.getKey().toString(), avg);
-                })
-                .sorted(Comparator.comparing(TrendPointDTO::getDate))
-                .toList();
-
-        return new ProgressTrendDTO(trends);
+        // 实时计算当前平均进度（不依赖空的 snapshot 表）
+        List<Long> studentIds = getCourseStudentIds(courseId);
+        if (studentIds.isEmpty()) {
+            return new ProgressTrendDTO(List.of());
+        }
+        Map<String, BigDecimal> progressMap = calculateAllStudentProgress(courseId, studentIds);
+        if (progressMap.isEmpty()) {
+            return new ProgressTrendDTO(List.of());
+        }
+        BigDecimal avg = progressMap.values().stream()
+                .reduce(BigDecimal.ZERO, BigDecimal::add)
+                .divide(BigDecimal.valueOf(progressMap.size()), 1, RoundingMode.HALF_UP);
+        return new ProgressTrendDTO(List.of(new TrendPointDTO(LocalDate.now().toString(), avg)));
     }
 
     /**
@@ -218,7 +215,7 @@ public class StudyMonitorAppServiceImpl implements StudyMonitorAppService {
 
         // 批量查询所有节点的学习记录
         Map<Integer, Long> nodeCompletedCountMap;
-        if (totalStudents > 0) {
+        if (totalStudents > 0 && !nodes.isEmpty()) {
             List<Integer> nodeIds = nodes.stream().map(CourseNodePO::getId).collect(Collectors.toList());
             List<StudentCourseNodeStudyRecordPO> allStudyRecords = studentCourseNodeStudyRecordService.list(
                     Wrappers.lambdaQuery(StudentCourseNodeStudyRecordPO.class)
@@ -399,18 +396,39 @@ public class StudyMonitorAppServiceImpl implements StudyMonitorAppService {
             return List.of();
         }
 
-        Map<Long, Integer> activityScores = new HashMap<>();
-        for (Long studentId : studentIds) {
-            List<StudentCourseNodeStudyRecordPO> records = studentCourseNodeStudyRecordService
-                    .findByCourseNodeId(studentId.intValue(), null);
-            activityScores.put(studentId, records != null ? records.size() * 10 : 0);
+        // 查本课程节点 ID，限定不跨课程
+        List<Integer> courseNodeIds = getCourseNodes(courseId).stream().map(CourseNodePO::getId).toList();
+        if (courseNodeIds.isEmpty()) {
+            return List.of();
         }
 
-        return activityScores.entrySet().stream()
+        // 批量查学生名
+        Map<Long, String> nameMap = studentService.listByIds(studentIds.stream().map(Long::intValue).toList())
+                .stream().collect(Collectors.toMap(s -> s.getId().longValue(), StudentPO::getStudentName, (a, b) -> a));
+
+        Map<Long, Integer> activityScores = new HashMap<>();
+        for (Long studentId : studentIds) {
+            List<StudentCourseNodeStudyRecordPO> records = studentCourseNodeStudyRecordService.list(
+                    Wrappers.lambdaQuery(StudentCourseNodeStudyRecordPO.class)
+                            .eq(StudentCourseNodeStudyRecordPO::getStudentId, studentId.intValue())
+                            .in(StudentCourseNodeStudyRecordPO::getCourseNodeId, courseNodeIds));
+            activityScores.put(studentId, records.size() * 10);
+        }
+
+        // 按分数降序排列，正确编号排名
+        List<Map.Entry<Long, Integer>> sorted = activityScores.entrySet().stream()
                 .sorted(Map.Entry.<Long, Integer>comparingByValue().reversed())
                 .limit(10)
-                .map(entry -> new ActivityRankingDTO(1, entry.getKey(), STUDENT_NAME_PREFIX + entry.getKey(), null, entry.getValue()))
                 .toList();
+        List<ActivityRankingDTO> result = new ArrayList<>();
+        int rank = 1;
+        for (Map.Entry<Long, Integer> entry : sorted) {
+            result.add(new ActivityRankingDTO(rank, entry.getKey(),
+                    nameMap.getOrDefault(entry.getKey(), STUDENT_NAME_PREFIX + entry.getKey()),
+                    null, entry.getValue()));
+            rank++;
+        }
+        return result;
     }
 
     @Override
@@ -939,11 +957,18 @@ public class StudyMonitorAppServiceImpl implements StudyMonitorAppService {
     }
 
     private ActivityIndicatorDTO calculateActivity(Long courseId, List<Long> studentIds) {
+        // 查本课程节点 ID，限定不跨课程
+        List<Integer> courseNodeIds = getCourseNodes(courseId).stream().map(CourseNodePO::getId).toList();
+        if (courseNodeIds.isEmpty()) {
+            return new ActivityIndicatorDTO(0, 0, 0, 0, 0);
+        }
         Set<Long> activeStudentIds = new HashSet<>();
         for (Long studentId : studentIds) {
-            List<StudentCourseNodeStudyRecordPO> records = studentCourseNodeStudyRecordService
-                    .findByCourseNodeId(studentId.intValue(), null);
-            if (records != null && !records.isEmpty()) {
+            List<StudentCourseNodeStudyRecordPO> records = studentCourseNodeStudyRecordService.list(
+                    Wrappers.lambdaQuery(StudentCourseNodeStudyRecordPO.class)
+                            .eq(StudentCourseNodeStudyRecordPO::getStudentId, studentId.intValue())
+                            .in(StudentCourseNodeStudyRecordPO::getCourseNodeId, courseNodeIds));
+            if (!records.isEmpty()) {
                 activeStudentIds.add(studentId);
             }
         }
@@ -1528,11 +1553,11 @@ public class StudyMonitorAppServiceImpl implements StudyMonitorAppService {
                     .map(Integer::longValue)
                     .toList();
 
-            // 3. 获取课程进度快照（用于判断进度滞后）
-            Map<Long, StudyProgressSnapshotPO> progressMap = studyProgressSnapshotService
-                    .listLatestByCourseAndStudentIds(courseId.longValue(), studentIdLongs)
-                    .stream()
-                    .collect(Collectors.toMap(StudyProgressSnapshotPO::getStudentId, Function.identity(), (a, b) -> a));
+            // 3. 实时计算课程进度（不依赖空的 snapshot 表）
+            Map<Long, BigDecimal> progressMap = new HashMap<>();
+            for (Integer sid : studentIds) {
+                progressMap.put(sid.longValue(), calculateStudentProgress(sid, courseId));
+            }
 
             // 4. 获取学生最后学习记录（用于判断卡关和不活跃）
             Map<Integer, StudentCourseNodeStudyRecordPO> lastRecordMap = studentCourseNodeStudyRecordService
@@ -1641,12 +1666,10 @@ public class StudyMonitorAppServiceImpl implements StudyMonitorAppService {
      * 检查进度滞后风险
      * 判断学生当前进度是否落后于预期
      */
-    private StudyRiskWarningPO checkLaggingRisk(Long studentId, Long courseId, StudyProgressSnapshotPO progress) {
-        if (progress == null || progress.getProgress() == null) {
+    private StudyRiskWarningPO checkLaggingRisk(Long studentId, Long courseId, BigDecimal currentProgress) {
+        if (currentProgress == null) {
             return null;
         }
-
-        BigDecimal currentProgress = progress.getProgress();
         String riskLevel;
         if (currentProgress.compareTo(BigDecimal.valueOf(LAGGING_HIGH_THRESHOLD)) < 0) {
             riskLevel = RISK_HIGH;
