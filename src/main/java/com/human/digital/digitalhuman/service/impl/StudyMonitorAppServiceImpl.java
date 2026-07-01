@@ -899,6 +899,69 @@ public class StudyMonitorAppServiceImpl implements StudyMonitorAppService {
                 .setScale(1, RoundingMode.HALF_UP);
     }
 
+    @Override
+    public Map<Integer, Integer> getLearningTimeDistribution(Long courseId, Long teacherId) {
+        checkPermission(courseId, teacherId);
+        // 查本课程所有节点的学习记录，按小时分桶
+        List<CourseNodePO> nodes = getCourseNodes(courseId);
+        if (nodes.isEmpty()) {
+            return Collections.emptyMap();
+        }
+        Set<Integer> courseNodeIds = nodes.stream().map(CourseNodePO::getId).collect(Collectors.toSet());
+        List<StudentCourseNodeStudyRecordPO> records = studentCourseNodeStudyRecordService.list(
+                Wrappers.lambdaQuery(StudentCourseNodeStudyRecordPO.class)
+                        .in(StudentCourseNodeStudyRecordPO::getCourseNodeId, courseNodeIds));
+        // 初始化 24 小时全 0
+        Map<Integer, Integer> hourMap = new java.util.TreeMap<>();
+        for (int h = 0; h < 24; h++) hourMap.put(h, 0);
+        // 按 study_start_time 的小时分桶
+        for (StudentCourseNodeStudyRecordPO r : records) {
+            if (r.getStudyStartTime() != null) {
+                int hour = r.getStudyStartTime().getHour();
+                hourMap.merge(hour, 1, Integer::sum);
+            }
+        }
+        return hourMap;
+    }
+
+    @Override
+    public List<StudentProgressDTO> getProgressRanking(Long courseId, Long teacherId) {
+        checkPermission(courseId, teacherId);
+        List<Long> studentIds = getCourseStudentIds(courseId);
+        if (studentIds.isEmpty()) {
+            return Collections.emptyList();
+        }
+        // 批量查学生名
+        Map<Integer, String> nameMap = studentService.listByIds(studentIds.stream().map(Long::intValue).toList())
+                .stream().collect(Collectors.toMap(StudentPO::getId, StudentPO::getStudentName, (a, b) -> a));
+        // 批量查班级名
+        Map<Integer, String> classNameMap = new HashMap<>();
+        List<StudentPO> students = studentService.listByIds(studentIds.stream().map(Long::intValue).toList());
+        List<Integer> classIds = students.stream().map(StudentPO::getClassId).filter(Objects::nonNull).distinct().toList();
+        if (!classIds.isEmpty()) {
+            classNameMap = schoolClassService.listByIds(classIds).stream()
+                    .collect(Collectors.toMap(SchoolClassPO::getId, SchoolClassPO::getClassName, (a, b) -> a));
+        }
+        // 计算每个学生的进度
+        List<StudentProgressDTO> ranking = new ArrayList<>();
+        for (Long sid : studentIds) {
+            StudentPO student = students.stream().filter(s -> s.getId().equals(sid.intValue())).findFirst().orElse(null);
+            if (student == null) continue;
+            BigDecimal progress = calculateStudentProgress(student.getId(), courseId.intValue());
+            StudentProgressDTO dto = new StudentProgressDTO();
+            dto.setStudentId(sid);
+            dto.setStudentName(student.getStudentName());
+            dto.setStudentNo(student.getIdNumber());
+            dto.setClassName(classNameMap.get(student.getClassId()));
+            dto.setCourseProgress(progress);
+            dto.setLastLoginTime(student.getLastLoginTime());
+            ranking.add(dto);
+        }
+        // 按进度降序，取 Top 10
+        ranking.sort((a, b) -> b.getCourseProgress().compareTo(a.getCourseProgress()));
+        return ranking.stream().limit(10).toList();
+    }
+
     private CoreIndicatorOverviewDTO emptyOverview() {
         return new CoreIndicatorOverviewDTO(
                 new ProgressIndicatorDTO(BigDecimal.ZERO, BigDecimal.ZERO, 0, 0),

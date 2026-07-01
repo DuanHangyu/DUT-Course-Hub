@@ -13,6 +13,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 学情监控控制器
@@ -84,6 +85,22 @@ public class StudyMonitorController {
             @Parameter(description = "课程ID") @RequestParam("courseId") Long courseId) {
         long teacherId = StpUtil.getLoginIdAsLong();
         return studyMonitorAppService.getActivityHeatmap(courseId, teacherId);
+    }
+
+    @GetMapping("/time-distribution")
+    @Operation(summary = "获取学习时段分布（24小时）")
+    public Map<Integer, Integer> getTimeDistribution(
+            @Parameter(description = "课程ID") @RequestParam("courseId") Long courseId) {
+        long teacherId = StpUtil.getLoginIdAsLong();
+        return studyMonitorAppService.getLearningTimeDistribution(courseId, teacherId);
+    }
+
+    @GetMapping("/progress-ranking")
+    @Operation(summary = "获取学生进度排行榜 Top10")
+    public List<StudentProgressDTO> getProgressRanking(
+            @Parameter(description = "课程ID") @RequestParam("courseId") Long courseId) {
+        long teacherId = StpUtil.getLoginIdAsLong();
+        return studyMonitorAppService.getProgressRanking(courseId, teacherId);
     }
 
     @GetMapping("/chapter-efficiency")

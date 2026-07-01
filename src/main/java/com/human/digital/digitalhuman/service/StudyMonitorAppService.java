@@ -3,6 +3,7 @@ package com.human.digital.digitalhuman.service;
 import com.human.digital.digitalhuman.service.model.response.*;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 学情监控应用服务接口
@@ -170,4 +171,14 @@ public interface StudyMonitorAppService {
      * 统计每个学生的卡关、进度滞后、不活跃等风险并写入预警表
      */
     void calculateRiskWarning();
+
+    /**
+     * 学习时段分布（24小时按小时分桶）
+     */
+    Map<Integer, Integer> getLearningTimeDistribution(Long courseId, Long teacherId);
+
+    /**
+     * 学生进度排行榜（按进度降序 Top 10）
+     */
+    List<StudentProgressDTO> getProgressRanking(Long courseId, Long teacherId);
 }
