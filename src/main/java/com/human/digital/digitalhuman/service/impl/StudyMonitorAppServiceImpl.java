@@ -1216,11 +1216,16 @@ public class StudyMonitorAppServiceImpl implements StudyMonitorAppService {
                 nodeDto.setDuration(0);
                 nodeDto.setProgress(BigDecimal.ZERO);
             } else {
-                // 取最新的学习记录
-                StudentCourseNodeStudyRecordPO latestRecord = records.getFirst();
-                nodeDto.setDuration(latestRecord.getStudyTime());
+                // 判定完成：与学生端一致——任意一条记录 completed=true 即算完成
+                boolean completed = records.stream()
+                        .anyMatch(r -> Objects.equals(r.getCompleted(), true));
+                // 学习时长取所有记录总和
+                int totalStudyTime = records.stream()
+                        .mapToInt(StudentCourseNodeStudyRecordPO::getStudyTime)
+                        .sum();
+                nodeDto.setDuration(totalStudyTime);
 
-                if (latestRecord.getStudyEndTime() != null) {
+                if (completed) {
                     nodeDto.setStatus(2); // 已完成
                     nodeDto.setProgress(BigDecimal.valueOf(100));
                 } else {
