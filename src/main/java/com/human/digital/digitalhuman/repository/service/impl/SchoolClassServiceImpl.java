@@ -22,7 +22,7 @@ public class SchoolClassServiceImpl extends ServiceImpl<SchoolClassMapper, Schoo
     public IPage<SchoolClassPO> pageQuery(Integer page, Integer size, Integer schoolId, String className) {
         Page<SchoolClassPO> pageParam = new Page<>(page, size);
         return this.page(pageParam, new com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper<SchoolClassPO>()
-                .eq(SchoolClassPO::getSchoolId, schoolId)
+                .eq(schoolId != null && schoolId > 0, SchoolClassPO::getSchoolId, schoolId)
                 .like(StringUtils.isNotBlank(className), SchoolClassPO::getClassName, className)
                 .orderByDesc(SchoolClassPO::getCreateTime));
     }
