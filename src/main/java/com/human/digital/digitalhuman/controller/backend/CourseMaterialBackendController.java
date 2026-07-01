@@ -7,12 +7,16 @@ import com.human.digital.digitalhuman.service.model.request.CourseMaterialFileUp
 import com.human.digital.digitalhuman.service.model.request.CourseMaterialFolderCreateCmd;
 import com.human.digital.digitalhuman.service.model.request.CourseMaterialFolderRenameCmd;
 import com.human.digital.digitalhuman.service.model.request.CourseMaterialSortCmd;
+import com.human.digital.digitalhuman.service.model.response.CourseMaterialFileDTO;
+import com.human.digital.digitalhuman.service.model.response.CourseMaterialListDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * 课程资料后台管理
@@ -28,6 +32,21 @@ import org.springframework.web.bind.annotation.*;
 public class CourseMaterialBackendController {
 
     private final CourseMaterialAppService courseMaterialAppService;
+
+    @GetMapping("/list")
+    @Operation(summary = "获取课程资料列表")
+    public CourseMaterialListDTO getMaterialList(
+            @RequestParam("courseId") @Parameter(description = "课程ID") Integer courseId) {
+        return courseMaterialAppService.getMaterialList(courseId);
+    }
+
+    @GetMapping("/folder/{folderId}/files")
+    @Operation(summary = "获取文件夹内文件列表")
+    public List<CourseMaterialFileDTO> getFolderFiles(
+            @PathVariable("folderId") @Parameter(description = "文件夹ID") Integer folderId,
+            @RequestParam("courseId") @Parameter(description = "课程ID") Integer courseId) {
+        return courseMaterialAppService.getFolderFiles(folderId, courseId);
+    }
 
     @PostMapping("/folder/create")
     @Operation(summary = "创建文件夹")
