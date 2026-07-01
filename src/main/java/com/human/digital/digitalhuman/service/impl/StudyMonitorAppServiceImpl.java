@@ -1154,9 +1154,11 @@ public class StudyMonitorAppServiceImpl implements StudyMonitorAppService {
         List<HomeworkPO> homeworks = homeworkService.list(Wrappers.lambdaQuery(HomeworkPO.class)
                 .eq(HomeworkPO::getCourseId, courseId.intValue()));
 
-        List<HomeworkSubmitPO> submits = homeworkSubmitService.list(Wrappers.lambdaQuery(HomeworkSubmitPO.class)
-                .eq(HomeworkSubmitPO::getStudentId, studentId.intValue())
-                .in(HomeworkSubmitPO::getHomeworkId, homeworks.stream().map(HomeworkPO::getId).collect(Collectors.toList())));
+        // homeworks 为空时不能 .in(空集合)，否则生成 IN () → SQL 语法错
+        List<HomeworkSubmitPO> submits = homeworks.isEmpty() ? Collections.emptyList() :
+                homeworkSubmitService.list(Wrappers.lambdaQuery(HomeworkSubmitPO.class)
+                        .eq(HomeworkSubmitPO::getStudentId, studentId.intValue())
+                        .in(HomeworkSubmitPO::getHomeworkId, homeworks.stream().map(HomeworkPO::getId).collect(Collectors.toList())));
 
         // 计算提交率
         if (homeworks.isEmpty()) {
