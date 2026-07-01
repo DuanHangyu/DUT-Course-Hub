@@ -1225,7 +1225,7 @@ public class StudyMonitorAppServiceImpl implements StudyMonitorAppService {
                     nodeDto.setProgress(BigDecimal.valueOf(100));
                 } else {
                     nodeDto.setStatus(1); // 进行中
-                    nodeDto.setProgress(BigDecimal.valueOf(50));
+                    nodeDto.setProgress(BigDecimal.ZERO);
                 }
             }
             nodeProgressList.add(nodeDto);
