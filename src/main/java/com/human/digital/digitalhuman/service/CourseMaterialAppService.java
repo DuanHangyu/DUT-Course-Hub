@@ -8,14 +8,17 @@ import com.human.digital.digitalhuman.common.exception.BusinessException;
 import com.human.digital.digitalhuman.common.utils.OssClientUtils;
 import com.human.digital.digitalhuman.repository.po.CourseMaterialFilePO;
 import com.human.digital.digitalhuman.repository.po.CourseMaterialFolderPO;
+import com.human.digital.digitalhuman.repository.po.CourseNodePO;
 import com.human.digital.digitalhuman.repository.service.CourseMaterialFileService;
 import com.human.digital.digitalhuman.repository.service.CourseMaterialFolderService;
+import com.human.digital.digitalhuman.repository.service.CourseNodeService;
 import com.human.digital.digitalhuman.repository.service.CourseService;
 import com.human.digital.digitalhuman.service.model.request.CourseMaterialFileMoveCmd;
 import com.human.digital.digitalhuman.service.model.request.CourseMaterialFileRenameCmd;
 import com.human.digital.digitalhuman.service.model.request.CourseMaterialFileUploadCmd;
 import com.human.digital.digitalhuman.service.model.request.CourseMaterialFolderCreateCmd;
 import com.human.digital.digitalhuman.service.model.request.CourseMaterialFolderRenameCmd;
+import com.human.digital.digitalhuman.service.model.dto.FileInfoDTO;
 import com.human.digital.digitalhuman.service.model.request.CourseMaterialSortCmd;
 import com.human.digital.digitalhuman.service.model.response.CourseMaterialFileDTO;
 import com.human.digital.digitalhuman.service.model.response.CourseMaterialFolderDTO;
@@ -24,6 +27,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import cn.hutool.core.util.StrUtil;
+import cn.hutool.json.JSONUtil;
+
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,6 +50,7 @@ public class CourseMaterialAppService {
     private final CourseMaterialFolderService folderService;
     private final CourseMaterialFileService fileService;
     private final CourseService courseService;
+    private final CourseNodeService courseNodeService;
     private final OssClientUtils ossClientUtils;
 
     // ==================== 文件夹操作 ====================
@@ -244,9 +252,27 @@ public class CourseMaterialAppService {
                         .build())
                 .toList();
 
+        // 汇总各节点的文件（files_url）到全局资料库
+        List<CourseMaterialFileDTO> allFiles = new ArrayList<>(fileDTOs);
+        List<CourseNodePO> nodes = courseNodeService.queryByCourseId(courseId);
+        int syntheticId = -1;
+        for (CourseNodePO node : nodes) {
+            if (StrUtil.isBlank(node.getFilesUrl())) continue;
+            List<FileInfoDTO> nodeFiles = JSONUtil.toList(node.getFilesUrl(), FileInfoDTO.class);
+            for (FileInfoDTO f : nodeFiles) {
+                allFiles.add(CourseMaterialFileDTO.builder()
+                        .id(syntheticId--)
+                        .fileName(f.getFileName())
+                        .ossUrl(ossClientUtils.getSignedUrl(f.getUrl()))
+                        .fileType(StrUtil.isNotBlank(f.getFileName()) && f.getFileName().contains(".")
+                                ? f.getFileName().substring(f.getFileName().lastIndexOf(".") + 1) : null)
+                        .build());
+            }
+        }
+
         return CourseMaterialListDTO.builder()
                 .folders(folderDTOs)
-                .files(fileDTOs)
+                .files(allFiles)
                 .build();
     }
 
