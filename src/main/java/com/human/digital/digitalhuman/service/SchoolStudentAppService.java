@@ -60,7 +60,7 @@ public class SchoolStudentAppService {
         wrapper.eq(StringUtils.hasText(query.getStudentName()), StudentPO::getStudentName, query.getStudentName())
                 .like(StringUtils.hasText(query.getIdNumber()), StudentPO::getIdNumber, query.getIdNumber())
                 .eq(query.getClassId() != null, StudentPO::getClassId, query.getClassId())
-                .eq(query.getSchoolId() != null, StudentPO::getSchoolId, query.getSchoolId())
+                .eq(query.getSchoolId() != null && query.getSchoolId() > 0, StudentPO::getSchoolId, query.getSchoolId())
                 .eq(schoolId != null, StudentPO::getSchoolId, schoolId)
                 .orderByDesc(StudentPO::getCreateTime);
 
@@ -77,9 +77,11 @@ public class SchoolStudentAppService {
                 .filter(java.util.Objects::nonNull)
                 .collect(java.util.stream.Collectors.toSet());
 
-        // 查询班级信息
-        Map<Integer, String> classNameMap = schoolClassService.listByIds(classIds).stream()
-                .collect(Collectors.toMap(SchoolClassPO::getId, SchoolClassPO::getClassName));
+        // 查询班级信息（classIds 为空时不能 listByIds，否则 MyBatis-Plus 生成 IN () 报语法错）
+        Map<Integer, String> classNameMap = classIds.isEmpty()
+                ? java.util.Collections.emptyMap()
+                : schoolClassService.listByIds(classIds).stream()
+                        .collect(Collectors.toMap(SchoolClassPO::getId, SchoolClassPO::getClassName));
 
         return page.convert(po -> StudentBackendDTO.of(po, classNameMap.get(po.getClassId())));
     }
@@ -453,7 +455,7 @@ public class SchoolStudentAppService {
         wrapper.eq(StringUtils.hasText(query.getStudentName()), StudentPO::getStudentName, query.getStudentName())
                 .like(StringUtils.hasText(query.getIdNumber()), StudentPO::getIdNumber, query.getIdNumber())
                 .eq(query.getClassId() != null, StudentPO::getClassId, query.getClassId())
-                .eq(query.getSchoolId() != null, StudentPO::getSchoolId, query.getSchoolId())
+                .eq(query.getSchoolId() != null && query.getSchoolId() > 0, StudentPO::getSchoolId, query.getSchoolId())
                 .eq(schoolId != null, StudentPO::getSchoolId, schoolId)
                 .orderByDesc(StudentPO::getCreateTime);
         return wrapper;
