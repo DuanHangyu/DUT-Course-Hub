@@ -586,11 +586,13 @@ public class CourseAppService {
                 .toList();
         int totalNodeCount = validNodes.size();
 
-        // 获取学生的学习记录，计算学习过的节点数
+        // 获取学生在【本课程】的 completed 学习记录（之前没按课程过滤，导致跨课程虚高）
+        Set<Integer> courseNodeIds = allNodes.stream().map(CourseNodePO::getId).collect(Collectors.toSet());
         List<StudentCourseNodeStudyRecordPO> allStudyRecords = studyRecordService.list(Wrappers.lambdaQuery(
                 StudentCourseNodeStudyRecordPO.class)
                 .eq(StudentCourseNodeStudyRecordPO::getStudentId, studentId)
-                .eq(StudentCourseNodeStudyRecordPO::getCompleted, true));
+                .eq(StudentCourseNodeStudyRecordPO::getCompleted, true)
+                .in(StudentCourseNodeStudyRecordPO::getCourseNodeId, courseNodeIds));
         // 获取学习过的节点ID集合
         Set<Integer> studiedNodeIds = allStudyRecords.stream()
                 .map(StudentCourseNodeStudyRecordPO::getCourseNodeId)
