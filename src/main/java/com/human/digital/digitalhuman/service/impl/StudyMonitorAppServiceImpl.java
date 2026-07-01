@@ -855,6 +855,32 @@ public class StudyMonitorAppServiceImpl implements StudyMonitorAppService {
         }
     }
 
+    /**
+     * 实时计算学生在某课程的进度（已完成内容节点数 / 内容节点总数 × 100）。
+     * 不依赖 study_progress_snapshot（该表无定时任务写入，始终为空）。
+     */
+    private BigDecimal calculateStudentProgress(Integer studentId, Integer courseId) {
+        List<CourseNodePO> allNodes = courseNodeService.queryByCourseId(courseId);
+        List<CourseNodePO> validNodes = allNodes.stream()
+                .filter(node -> !node.startNode() && !node.endNode())
+                .toList();
+        if (validNodes.isEmpty()) {
+            return BigDecimal.ZERO;
+        }
+        Set<Integer> courseNodeIds = allNodes.stream().map(CourseNodePO::getId).collect(Collectors.toSet());
+        List<StudentCourseNodeStudyRecordPO> records = studentCourseNodeStudyRecordService.list(
+                Wrappers.lambdaQuery(StudentCourseNodeStudyRecordPO.class)
+                        .eq(StudentCourseNodeStudyRecordPO::getStudentId, studentId)
+                        .eq(StudentCourseNodeStudyRecordPO::getCompleted, true)
+                        .in(StudentCourseNodeStudyRecordPO::getCourseNodeId, courseNodeIds));
+        long studiedCount = records.stream()
+                .map(StudentCourseNodeStudyRecordPO::getCourseNodeId)
+                .distinct()
+                .count();
+        return BigDecimal.valueOf(studiedCount * 100.0 / validNodes.size())
+                .setScale(1, RoundingMode.HALF_UP);
+    }
+
     private CoreIndicatorOverviewDTO emptyOverview() {
         return new CoreIndicatorOverviewDTO(
                 new ProgressIndicatorDTO(BigDecimal.ZERO, BigDecimal.ZERO, 0, 0),
@@ -1058,7 +1084,7 @@ public class StudyMonitorAppServiceImpl implements StudyMonitorAppService {
         List<HomeworkSubmitPO> allSubmits = homeworkIds.isEmpty() ? List.of() :
                 homeworkSubmitService.list(Wrappers.lambdaQuery(HomeworkSubmitPO.class)
                         .in(HomeworkSubmitPO::getStudentId, studentIds)
-                        .in(homeworkIds.size() > 1, HomeworkSubmitPO::getHomeworkId, homeworkIds));
+                        .in(HomeworkSubmitPO::getHomeworkId, homeworkIds));
         Map<Integer, Long> submitCountMap = allSubmits.stream()
                 .collect(Collectors.groupingBy(HomeworkSubmitPO::getStudentId, Collectors.counting()));
 
@@ -1142,12 +1168,8 @@ public class StudyMonitorAppServiceImpl implements StudyMonitorAppService {
         vo.setStudentName(student.getStudentName());
         vo.setLastActiveTime(student.getLastLoginTime());
 
-        // 获取课程进度
-        StudyProgressSnapshotPO progress = studyProgressSnapshotService.getLatestByCourseAndStudent(courseId.longValue(), studentId.longValue());
-        BigDecimal courseProgress = BigDecimal.ZERO;
-        if (progress != null) {
-            courseProgress = progress.getProgress();
-        }
+        // 实时计算课程进度（不依赖快照表）
+        BigDecimal courseProgress = calculateStudentProgress(studentId.intValue(), courseId.intValue());
         vo.setCourseProgress(courseProgress);
 
         // 获取作业统计
@@ -1266,11 +1288,8 @@ public class StudyMonitorAppServiceImpl implements StudyMonitorAppService {
         dto.setLastLoginTime(student.getLastLoginTime());
 
         // 获取课程进度
-        StudyProgressSnapshotPO progress = studyProgressSnapshotService.getLatestByCourseAndStudent(courseId.longValue(), student.getId().longValue());
-        BigDecimal courseProgress = BigDecimal.ZERO;
-        if (progress != null) {
-            courseProgress = progress.getProgress();
-        }
+        // 实时计算课程进度
+        BigDecimal courseProgress = calculateStudentProgress(student.getId(), courseId.intValue());
         dto.setCourseProgress(courseProgress);
 
         // 获取作业统计
@@ -1354,9 +1373,8 @@ public class StudyMonitorAppServiceImpl implements StudyMonitorAppService {
         dto.setClassName(classNameMap.get(student.getClassId()));
         dto.setLastLoginTime(student.getLastLoginTime());
 
-        // 从预加载的Map获取课程进度
-        StudyProgressSnapshotPO progress = progressMap.get(student.getId());
-        BigDecimal courseProgress = progress != null ? progress.getProgress() : BigDecimal.ZERO;
+        // 实时计算课程进度（不依赖快照表，快照表为空）
+        BigDecimal courseProgress = calculateStudentProgress(student.getId(), courseId.intValue());
         dto.setCourseProgress(courseProgress);
 
         // 使用预加载的作业总数
@@ -1374,8 +1392,9 @@ public class StudyMonitorAppServiceImpl implements StudyMonitorAppService {
 
         // 判断预警状态
         boolean isWarning = false;
-        // 进度 < 50%
-        if (courseProgress.compareTo(BigDecimal.valueOf(50)) < 0) {
+        // 进度 < 50%（仅对已开始学习的学生预警，未开始的进度为 0 不算预警）
+        boolean hasStarted = lastRecordMap.get(student.getId()) != null;
+        if (hasStarted && courseProgress.compareTo(BigDecimal.valueOf(50)) < 0) {
             isWarning = true;
         }
         // 缺交数 >= 3

@@ -22,7 +22,8 @@ public class StudyProgressSnapshotServiceImpl extends ServiceImpl<StudyProgressS
 
     @Override
     public void saveBatch(List<StudyProgressSnapshotPO> snapshotList) {
-        this.saveBatch(snapshotList);
+        // 原代码 this.saveBatch 是无限递归；改为调父类的批量保存
+        snapshotList.forEach(this::save);
     }
 
     @Override
