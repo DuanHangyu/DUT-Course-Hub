@@ -962,6 +962,91 @@ public class StudyMonitorAppServiceImpl implements StudyMonitorAppService {
         return ranking.stream().limit(10).toList();
     }
 
+    @Override
+    public List<Map<String, Object>> getNodeCompletionRanking(Long courseId, Long teacherId) {
+        checkPermission(courseId, teacherId);
+        List<Long> studentIds = getCourseStudentIds(courseId);
+        int totalStudents = studentIds.size();
+        List<CourseNodePO> nodes = getCourseNodes(courseId).stream()
+                .filter(n -> !n.startNode() && !n.endNode())
+                .toList();
+        if (nodes.isEmpty() || totalStudents == 0) {
+            return Collections.emptyList();
+        }
+        Set<Integer> nodeIds = nodes.stream().map(CourseNodePO::getId).collect(Collectors.toSet());
+        List<StudentCourseNodeStudyRecordPO> records = studentCourseNodeStudyRecordService.list(
+                Wrappers.lambdaQuery(StudentCourseNodeStudyRecordPO.class)
+                        .in(StudentCourseNodeStudyRecordPO::getCourseNodeId, nodeIds)
+                        .eq(StudentCourseNodeStudyRecordPO::getCompleted, true));
+        Map<Integer, Long> completedMap = records.stream()
+                .collect(Collectors.groupingBy(StudentCourseNodeStudyRecordPO::getCourseNodeId, Collectors.counting()));
+        List<Map<String, Object>> result = new ArrayList<>();
+        for (CourseNodePO node : nodes) {
+            long completed = completedMap.getOrDefault(node.getId(), 0L);
+            BigDecimal rate = BigDecimal.valueOf(completed * 100.0 / totalStudents)
+                    .setScale(1, RoundingMode.HALF_UP);
+            Map<String, Object> m = new LinkedHashMap<>();
+            m.put("nodeName", node.getNodeName());
+            m.put("completionRate", rate);
+            m.put("completedCount", completed);
+            m.put("totalCount", totalStudents);
+            result.add(m);
+        }
+        result.sort(Comparator.comparing(m -> (BigDecimal) m.get("completionRate")));
+        return result;
+    }
+
+    @Override
+    public List<Map<String, Object>> getDailyStudyTrend(Long courseId, Long teacherId) {
+        checkPermission(courseId, teacherId);
+        List<CourseNodePO> nodes = getCourseNodes(courseId);
+        if (nodes.isEmpty()) return Collections.emptyList();
+        Set<Integer> nodeIds = nodes.stream().map(CourseNodePO::getId).collect(Collectors.toSet());
+        LocalDate endDate = LocalDate.now();
+        LocalDate startDate = endDate.minusDays(13);
+        List<StudentCourseNodeStudyRecordPO> records = studentCourseNodeStudyRecordService.list(
+                Wrappers.lambdaQuery(StudentCourseNodeStudyRecordPO.class)
+                        .in(StudentCourseNodeStudyRecordPO::getCourseNodeId, nodeIds)
+                        .ge(StudentCourseNodeStudyRecordPO::getStudyStartTime, startDate.atStartOfDay())
+                        .le(StudentCourseNodeStudyRecordPO::getStudyStartTime, endDate.atTime(23, 59, 59)));
+        Map<LocalDate, Long> dailyMap = records.stream()
+                .filter(r -> r.getStudyStartTime() != null)
+                .collect(Collectors.groupingBy(
+                        r -> r.getStudyStartTime().toLocalDate(), Collectors.counting()));
+        List<Map<String, Object>> result = new ArrayList<>();
+        for (int i = 0; i < 14; i++) {
+            LocalDate d = startDate.plusDays(i);
+            Map<String, Object> m = new LinkedHashMap<>();
+            m.put("date", d.toString());
+            m.put("count", dailyMap.getOrDefault(d, 0L));
+            result.add(m);
+        }
+        return result;
+    }
+
+    @Override
+    public Map<String, Integer> getProgressDistribution(Long courseId, Long teacherId) {
+        checkPermission(courseId, teacherId);
+        List<Long> studentIds = getCourseStudentIds(courseId);
+        Map<String, Integer> dist = new LinkedHashMap<>();
+        dist.put("未开始", 0);
+        dist.put("1-30%", 0);
+        dist.put("31-60%", 0);
+        dist.put("61-90%", 0);
+        dist.put("91-100%", 0);
+        if (studentIds.isEmpty()) return dist;
+        Map<String, BigDecimal> progressMap = calculateAllStudentProgress(courseId, studentIds);
+        for (BigDecimal p : progressMap.values()) {
+            double v = p.doubleValue();
+            if (v == 0) dist.merge("未开始", 1, Integer::sum);
+            else if (v <= 30) dist.merge("1-30%", 1, Integer::sum);
+            else if (v <= 60) dist.merge("31-60%", 1, Integer::sum);
+            else if (v <= 90) dist.merge("61-90%", 1, Integer::sum);
+            else dist.merge("91-100%", 1, Integer::sum);
+        }
+        return dist;
+    }
+
     private CoreIndicatorOverviewDTO emptyOverview() {
         return new CoreIndicatorOverviewDTO(
                 new ProgressIndicatorDTO(BigDecimal.ZERO, BigDecimal.ZERO, 0, 0),

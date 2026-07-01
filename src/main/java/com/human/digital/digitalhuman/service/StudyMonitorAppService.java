@@ -181,4 +181,19 @@ public interface StudyMonitorAppService {
      * 学生进度排行榜（按进度降序 Top 10）
      */
     List<StudentProgressDTO> getProgressRanking(Long courseId, Long teacherId);
+
+    /**
+     * 节点完成率排行（按完成率升序）
+     */
+    List<Map<String, Object>> getNodeCompletionRanking(Long courseId, Long teacherId);
+
+    /**
+     * 每日学习趋势（最近14天）
+     */
+    List<Map<String, Object>> getDailyStudyTrend(Long courseId, Long teacherId);
+
+    /**
+     * 班级进度分布（5档分桶）
+     */
+    Map<String, Integer> getProgressDistribution(Long courseId, Long teacherId);
 }

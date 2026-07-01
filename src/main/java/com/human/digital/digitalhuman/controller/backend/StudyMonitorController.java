@@ -103,6 +103,30 @@ public class StudyMonitorController {
         return studyMonitorAppService.getProgressRanking(courseId, teacherId);
     }
 
+    @GetMapping("/node-completion-ranking")
+    @Operation(summary = "获取节点完成率排行")
+    public List<Map<String, Object>> getNodeCompletionRanking(
+            @Parameter(description = "课程ID") @RequestParam("courseId") Long courseId) {
+        long teacherId = StpUtil.getLoginIdAsLong();
+        return studyMonitorAppService.getNodeCompletionRanking(courseId, teacherId);
+    }
+
+    @GetMapping("/daily-study-trend")
+    @Operation(summary = "获取每日学习趋势（14天）")
+    public List<Map<String, Object>> getDailyStudyTrend(
+            @Parameter(description = "课程ID") @RequestParam("courseId") Long courseId) {
+        long teacherId = StpUtil.getLoginIdAsLong();
+        return studyMonitorAppService.getDailyStudyTrend(courseId, teacherId);
+    }
+
+    @GetMapping("/progress-distribution")
+    @Operation(summary = "获取班级进度分布（5档）")
+    public Map<String, Integer> getProgressDistribution(
+            @Parameter(description = "课程ID") @RequestParam("courseId") Long courseId) {
+        long teacherId = StpUtil.getLoginIdAsLong();
+        return studyMonitorAppService.getProgressDistribution(courseId, teacherId);
+    }
+
     @GetMapping("/chapter-efficiency")
     @Operation(summary = "获取章节效率分布")
     public ChapterEfficiencyDTO getChapterEfficiency(
