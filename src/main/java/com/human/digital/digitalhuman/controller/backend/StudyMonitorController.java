@@ -178,6 +178,13 @@ public class StudyMonitorController {
         return studyMonitorAppService.handleRiskWarning(id, teacherId);
     }
 
+    @PostMapping("/trigger-risk-calculation")
+    @Operation(summary = "手动触发风险预警计算")
+    public Boolean triggerRiskCalculation() {
+        studyMonitorAppService.calculateRiskWarning();
+        return true;
+    }
+
     @GetMapping("/student-progress")
     @Operation(summary = "获取学生进度列表")
     public StudentProgressListVO getStudentProgressList(
