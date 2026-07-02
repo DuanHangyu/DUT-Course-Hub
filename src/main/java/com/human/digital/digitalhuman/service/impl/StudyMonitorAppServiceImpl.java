@@ -65,7 +65,6 @@ public class StudyMonitorAppServiceImpl implements StudyMonitorAppService {
     private final CourseNodeService courseNodeService;
     private final CourseStudentRelationService courseStudentRelationService;
     private final StudentCourseNodeStudyRecordService studentCourseNodeStudyRecordService;
-    private final StudyProgressSnapshotService studyProgressSnapshotService;
     private final StudyRiskWarningService studyRiskWarningService;
     private final KnowledgeBlindSpotService knowledgeBlindSpotService;
     private final StudentQuestionAnswerRecordService studentQuestionAnswerRecordService;
@@ -1248,11 +1247,7 @@ public class StudyMonitorAppServiceImpl implements StudyMonitorAppService {
                 schoolClassService.listByIds(classIds).stream()
                         .collect(Collectors.toMap(SchoolClassPO::getId, SchoolClassPO::getClassName, (a, b) -> a));
 
-        // 3. 批量查询学习进度快照
-        List<StudyProgressSnapshotPO> progressSnapshots = studyProgressSnapshotService.listLatestByCourseAndStudentIds(courseId, studentIds.stream().map(Long::valueOf).toList());
-        Map<Integer, StudyProgressSnapshotPO> progressMap = progressSnapshots.stream()
-                .collect(Collectors.toMap(p -> p.getStudentId().intValue(), p -> p, (a, b) -> a));
-
+        // 3. 进度已在 buildStudentProgressDTOWithPreloadedData 中实时计算（calculateStudentProgress）
         // 4. 批量查询作业提交（所有学生的提交）
         List<HomeworkSubmitPO> allSubmits = homeworkIds.isEmpty() ? List.of() :
                 homeworkSubmitService.list(Wrappers.lambdaQuery(HomeworkSubmitPO.class)
@@ -1283,7 +1278,7 @@ public class StudyMonitorAppServiceImpl implements StudyMonitorAppService {
 
         for (StudentPO student : allStudents) {
             StudentProgressDTO dto = buildStudentProgressDTOWithPreloadedData(
-                    student, courseId, classNameMap, progressMap, homeworks.size(), submitCountMap, lastRecordMap, nodeNameMap);
+                    student, courseId, classNameMap, homeworks.size(), submitCountMap, lastRecordMap, nodeNameMap);
             allProgressMap.put(dto.getStudentId(), dto);
             if (dto.getIsWarning()) {
                 warningCount++;
@@ -1537,7 +1532,6 @@ public class StudyMonitorAppServiceImpl implements StudyMonitorAppService {
     private StudentProgressDTO buildStudentProgressDTOWithPreloadedData(
             StudentPO student, Long courseId,
             Map<Integer, String> classNameMap,
-            Map<Integer, StudyProgressSnapshotPO> progressMap,
             int homeworkCount,
             Map<Integer, Long> submitCountMap,
             Map<Integer, StudentCourseNodeStudyRecordPO> lastRecordMap,
