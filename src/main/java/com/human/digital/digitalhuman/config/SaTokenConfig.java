@@ -64,7 +64,9 @@ public class SaTokenConfig implements WebMvcConfigurer {
             }
 
             // /user/** — 后台用户管理（超管 + 学校管理员）
-            if (path.startsWith("/user/") && role != 0 && role != 1) {
+            // 例外：/user/detail 是"查自己资料"，任何登录用户（含教师 role=2）都需要，
+            // 前端登录后路由守卫会调它来加载 profile；若拦掉教师会卡在登录环节。
+            if (path.startsWith("/user/") && !path.startsWith("/user/detail") && role != 0 && role != 1) {
                 throw new NotPermissionException("需要管理员权限", "role");
             }
 
