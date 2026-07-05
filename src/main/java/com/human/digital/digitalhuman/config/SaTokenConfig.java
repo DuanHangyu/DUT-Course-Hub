@@ -9,6 +9,8 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import java.util.Set;
+
 /**
  * Sa-Token 权限拦截器配置
  *
@@ -49,8 +51,13 @@ public class SaTokenConfig implements WebMvcConfigurer {
             }
 
             // /api/school/** — 校本课程管理（超管 + 学校管理员）
+            // 教师(role=2)需要读本校课程/统计/科目/班级学生 用于学情监控，放行下列只读端点；
+            // 写操作(create/update/delete/addStudent/addClass...)仍限管理员。服务层 pageQuery 已对非管理员走"我的课程"分支。
             if (path.startsWith("/api/school/") && role != 0 && role != 1) {
-                throw new NotPermissionException("需要管理员权限", "role");
+                String method = SaHolder.getRequest().getMethod();
+                if (!(role == 2 && isTeacherSchoolRead(path, method))) {
+                    throw new NotPermissionException("需要管理员权限", "role");
+                }
             }
 
             // /api/backend/** — 校本后台管理（学生/班级/科目，超管 + 学校管理员）
@@ -114,5 +121,46 @@ public class SaTokenConfig implements WebMvcConfigurer {
                 .addResourceLocations("classpath:/META-INF/resources/webjars/");
         registry.addResourceHandler("/swagger-ui/**")
                 .addResourceLocations("classpath:/META-INF/resources/webjars/springdoc/openapi-ui/");
+    }
+
+    /** 教师(role=2)在校本模块可读的 GET 路径（写操作一律不放行）。 */
+    private static final Set<String> TEACHER_SCHOOL_GET_READS = Set.of(
+            "/api/school/list",
+            "/api/school/stats",
+            "/api/school/subject-list",
+            "/api/school/class/all-with-students"
+    );
+
+    /** 教师(role=2)在校本模块可读的 POST 列表接口（按惯例用 POST 做分页查询的"读"）。 */
+    private static final Set<String> TEACHER_SCHOOL_POST_READS = Set.of(
+            "/api/school/class/list",
+            "/api/school/student/list"
+    );
+
+    /**
+     * 判断是否为教师可读的校本路径。
+     * 放行 GET 课程详情 /api/school/{id}（路径段纯数字）；DELETE /api/school/{id} 不放行。
+     */
+    private static boolean isTeacherSchoolRead(String path, String method) {
+        if (method == null) {
+            return false;
+        }
+        String m = method.toUpperCase();
+        if ("GET".equals(m)) {
+            if (TEACHER_SCHOOL_GET_READS.contains(path)) {
+                return true;
+            }
+            if (path.startsWith("/api/school/")) {
+                String tail = path.substring("/api/school/".length());
+                if (!tail.isEmpty() && tail.matches("\\d+")) {
+                    return true;
+                }
+            }
+            return false;
+        }
+        if ("POST".equals(m)) {
+            return TEACHER_SCHOOL_POST_READS.contains(path);
+        }
+        return false;
     }
 }
