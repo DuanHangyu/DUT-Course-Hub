@@ -42,8 +42,20 @@ public class UserAppService {
         UserPO current = currentUserOrReject();
         UserPO po = cmd.toPo();
         po.setPassword(PasswordUtils.ensureEncoded(po.getPassword()));
-        // 非超管：强制写入当前学校，且禁止越权创建超管/跨校账号
-        if (!Integer.valueOf(UserRoleEnums.SUPER_ADMIN.getCode()).equals(current.getRole())) {
+        if (Integer.valueOf(UserRoleEnums.SUPER_ADMIN.getCode()).equals(current.getRole())) {
+            // 超管创建：必须显式指定角色与所属学校，避免落库一个无学校的"野"账号
+            if (po.getRole() == null) {
+                throw new BusinessException(ErrorCodeEnums.NO_PERMISSION);
+            }
+            if (po.getSchoolId() == null || po.getSchoolId() <= 0) {
+                throw new BusinessException(ErrorCodeEnums.SCHOOL_ID_NOT_FOUND);
+            }
+            // 禁止通过本接口创建超管（超管应通过受控流程产生）
+            if (Integer.valueOf(UserRoleEnums.SUPER_ADMIN.getCode()).equals(po.getRole())) {
+                throw new BusinessException(ErrorCodeEnums.NO_PERMISSION);
+            }
+        } else {
+            // 非超管（学校管理员）：强制写入当前学校，且禁止越权创建超管/跨校账号
             if (current.getSchoolId() == null || current.getSchoolId() <= 0) {
                 throw new BusinessException(ErrorCodeEnums.NO_PERMISSION);
             }

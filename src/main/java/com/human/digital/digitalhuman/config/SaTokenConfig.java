@@ -53,6 +53,27 @@ public class SaTokenConfig implements WebMvcConfigurer {
                 throw new NotPermissionException("需要管理员权限", "role");
             }
 
+            // /api/backend/** — 校本后台管理（学生/班级/科目，超管 + 学校管理员）
+            if (path.startsWith("/api/backend/") && role != 0 && role != 1) {
+                throw new NotPermissionException("需要管理员权限", "role");
+            }
+
+            // /api/teacher/** — 教师管理（deprecated，仍限超管 + 学校管理员）
+            if (path.startsWith("/api/teacher/") && role != 0 && role != 1) {
+                throw new NotPermissionException("需要管理员权限", "role");
+            }
+
+            // /user/** — 后台用户管理（超管 + 学校管理员）
+            if (path.startsWith("/user/") && role != 0 && role != 1) {
+                throw new NotPermissionException("需要管理员权限", "role");
+            }
+
+            // /course/** — 课程管理后台（超管 + 学校管理员）
+            // 注意：startsWith("/course/") 不会误伤 /course-material/ 与 /course-template/
+            if (path.startsWith("/course/") && role != 0 && role != 1) {
+                throw new NotPermissionException("需要管理员权限", "role");
+            }
+
             // /course-template/** — 模板课管理（超管专属）
             if (path.startsWith("/course-template/") && role != 0) {
                 throw new NotPermissionException("需要超级管理员权限", "role");

@@ -33,6 +33,12 @@ public class UserCreateCmd {
     @NotNull(message = "状态不能为空")
     private Boolean state;
 
+    @Schema(description = "角色（0=超管,1=学校管理员,2=教师）；超管创建时必填，学校管理员创建时忽略")
+    private Integer role;
+
+    @Schema(description = "所属学校ID；超管创建时必填，学校管理员创建时忽略（强制为本校）")
+    private Integer schoolId;
+
     public UserPO toPo(){
         UserPO userPO = new UserPO();
         userPO.setAccount(account);
@@ -40,6 +46,8 @@ public class UserCreateCmd {
         userPO.setPhone(phone);
         userPO.setPassword(password);
         userPO.setState(state);
+        userPO.setRole(role);
+        userPO.setSchoolId(schoolId);
         return userPO;
     }
 }
