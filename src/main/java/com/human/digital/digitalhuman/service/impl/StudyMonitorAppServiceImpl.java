@@ -800,17 +800,17 @@ public class StudyMonitorAppServiceImpl implements StudyMonitorAppService {
         if (course == null) {
             throw new BusinessException(ErrorCodeEnums.COURSE_NOT_EXIST);
         }
-        // 先加载并校验当前后台用户角色，防止 ID 碰撞绕过角色校验：
-        // 仅 role=0（超管）和 role=1（学校管理员）可访问学情监控接口；role=2 教师/学生直接拒绝。
+        // 加载并校验当前后台用户角色，防止 ID 碰撞绕过：
+        // role=0 超管全放行；role=1 校管/role=2 教师 仅可访问本校课程；学生(role=3)及异常角色拒绝。
         UserPO userPO = userService.getById(teacherId.intValue());
         if (Objects.isNull(userPO)) {
             throw new BusinessException(ErrorCodeEnums.USER_NOT_EXIST);
         }
         Integer role = userPO.getRole();
-        if (!Objects.equals(role, 0) && !Objects.equals(role, 1)) {
+        if (role == null || role < 0 || role > 2) {
             throw new BusinessException(ErrorCodeEnums.NO_PERMISSION);
         }
-        // 课程创建者：放行（教师创建者必须是合法后台用户）
+        // 课程创建者：放行
         if (course.getCreatorId() != null && course.getCreatorId().equals(teacherId.intValue())) {
             return;
         }
@@ -818,7 +818,7 @@ public class StudyMonitorAppServiceImpl implements StudyMonitorAppService {
             // 超管：放行
             return;
         }
-        // 学校管理员：仅可访问本校课程。租户归属以 DB 中 userPO.getSchoolId() 为准，
+        // 学校管理员(1)/教师(2)：仅可访问本校课程。租户归属以 DB 中 userPO.getSchoolId() 为准，
         // 避免依赖可能被篡改或缺失的 session。
         Integer currentSchoolId = userPO.getSchoolId();
         Integer courseSchoolId = course.getSchoolId();
