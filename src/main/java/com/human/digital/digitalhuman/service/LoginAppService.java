@@ -51,7 +51,8 @@ public class LoginAppService {
             studentService.update(Wrappers.lambdaUpdate(StudentPO.class)
                     .set(StudentPO::getLastLoginTime, LocalDateTime.now())
                     .eq(StudentPO::getId, student.getId()));
-            // 保存学校ID到session
+            // 学生角色用 3（区别于后台 0/1/2），供拦截器路径级拦截
+            StpUtil.getSession().set("role", 3);
             if (student.getSchoolId() != null) {
                 StpUtil.getSession().set("schoolId", student.getSchoolId());
             }
@@ -71,7 +72,8 @@ public class LoginAppService {
                 log.info("用户密码已迁移为 BCrypt: userId={}", user.getId());
             }
             StpUtil.login(user.getId());
-            // 保存学校ID到session
+            // 保存角色和学校ID到session（供拦截器做路径级权限检查，无需每次查DB）
+            StpUtil.getSession().set("role", user.getRole());
             if (user.getSchoolId() != null) {
                 StpUtil.getSession().set("schoolId", user.getSchoolId());
             }

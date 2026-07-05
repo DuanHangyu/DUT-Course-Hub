@@ -1,6 +1,7 @@
 package com.human.digital.digitalhuman.config;
 
 import cn.dev33.satoken.exception.NotLoginException;
+import cn.dev33.satoken.exception.NotPermissionException;
 import com.human.digital.digitalhuman.common.exception.BusinessException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.FieldError;
@@ -28,6 +29,12 @@ public class GlobalException {
     public BaseResult<Void> handleException(NotLoginException e){
         log.error("e", e);
         return BaseResult.error(401, e.getMessage());
+    }
+
+    @ExceptionHandler(NotPermissionException.class)
+    public BaseResult<Void> handleException(NotPermissionException e){
+        log.warn("权限不足: {}", e.getMessage());
+        return BaseResult.error(403, "没有操作权限");
     }
 
     /**
