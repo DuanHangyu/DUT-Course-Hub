@@ -46,8 +46,15 @@ public class SaTokenConfig implements WebMvcConfigurer {
             }
 
             // /backend/** — 后台管理（超管 + 学校管理员）
+            // 例外：教师(role=2)需要作业管理、教师答疑；服务层按 teacherId 做归属隔离。
+            // 其它 /backend/** 子路径（overview/student/university-overview/customer-service 等）仍限管理员。
             if (path.startsWith("/backend/") && role != 0 && role != 1) {
-                throw new NotPermissionException("需要管理员权限", "role");
+                boolean teacherBackendAccess = role == 2
+                        && (path.startsWith("/backend/homework/")
+                                || path.startsWith("/backend/course-student-comment/"));
+                if (!teacherBackendAccess) {
+                    throw new NotPermissionException("需要管理员权限", "role");
+                }
             }
 
             // /api/school/** — 校本课程管理（超管 + 学校管理员）
@@ -83,14 +90,14 @@ public class SaTokenConfig implements WebMvcConfigurer {
                 throw new NotPermissionException("需要管理员权限", "role");
             }
 
-            // /course-template/** — 模板课管理（超管专属）
-            if (path.startsWith("/course-template/") && role != 0) {
-                throw new NotPermissionException("需要超级管理员权限", "role");
+            // /course-template/** — 模板课/课程内容管理（超管 + 学校管理员 + 教师）
+            if (path.startsWith("/course-template/") && role != 0 && role != 1 && role != 2) {
+                throw new NotPermissionException("需要教师或管理员权限", "role");
             }
 
-            // /course-material/** — 课程资料后台管理（超管 + 学校管理员）
-            if (path.startsWith("/course-material/") && role != 0 && role != 1) {
-                throw new NotPermissionException("需要管理员权限", "role");
+            // /course-material/** — 课程资料后台管理（超管 + 学校管理员 + 教师）
+            if (path.startsWith("/course-material/") && role != 0 && role != 1 && role != 2) {
+                throw new NotPermissionException("需要教师或管理员权限", "role");
             }
 
             // /api/study-monitor/** — 学情监控（超管 + 学校管理员 + 教师）
