@@ -1,2 +1,0 @@
-[    8444ms] NetworkError: Failed to execute 'importScripts' on 'WorkerGlobalScope': The script at 'https://sre//speech-worker.js' failed to load.
-    at blob:https://learn.deepolylink.com/9e9d79b3-c06a-42a9-a217-6028291701dc:3:7

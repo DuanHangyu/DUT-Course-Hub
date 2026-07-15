@@ -1,0 +1,14 @@
+:root {
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+.vue-flow__minimap {
+  transform: scale(75%);
+  transform-origin: bottom right;
+  background: transparent;
+}

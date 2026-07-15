@@ -1,3 +1,0 @@
-[    2051ms] [VERBOSE] [DOM] Password field is not contained in a form: (More info: https://goo.gl/9p2vKq) %o @ https://learn.deepolylink.com/login:0
-[    5079ms] NetworkError: Failed to execute 'importScripts' on 'WorkerGlobalScope': The script at 'https://sre//speech-worker.js' failed to load.
-    at blob:https://learn.deepolylink.com/342bd862-7966-4000-8765-8508e81d6505:3:7

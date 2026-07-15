@@ -57,10 +57,13 @@ node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+*.bak
 
-### Frontend repos (tracked separately) ###
-digital-human-admin/
-digital-human-web/
+### Local QA / tooling artifacts (do NOT commit) ###
+.gstack/
+.playwright-mcp/
+
+### Frontend repos (now tracked in this repo; node_modules/dist/.env still ignored) ###
 
 ### Local config with secrets (do NOT commit) ###
 src/main/resources/application-dev.yml

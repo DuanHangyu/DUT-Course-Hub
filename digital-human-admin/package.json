@@ -1,0 +1,44 @@
+{
+  "name": "vite-project",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build --mode formal",
+    "build:formal": "vite build --mode formal",
+    "preview": "vite preview",
+    "build:test": "vite build --mode test"
+  },
+  "dependencies": {
+    "@ant-design/icons-vue": "^7.0.1",
+    "@vue-flow/core": "^1.48.2",
+    "@vueform/slider": "^2.1.10",
+    "@vueuse/core": "^13.3.0",
+    "ant-design-vue": "^4.2.6",
+    "autofit.js": "^3.2.8",
+    "axios": "^1.9.0",
+    "dayjs": "^1.11.19",
+    "echarts": "^5.6.0",
+    "echarts-wordcloud": "^2.1.0",
+    "file-saver": "^2.0.5",
+    "interactjs": "^1.10.27",
+    "lodash-es": "^4.17.21",
+    "nprogress": "^0.2.0",
+    "pinia": "^3.0.3",
+    "qs": "^6.15.0",
+    "vue": "^3.5.13",
+    "vue-router": "^4.5.1",
+    "vue3-pdf-app": "^1.0.3"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.2.3",
+    "autoprefixer": "^10.4.19",
+    "less": "^4.3.0",
+    "postcss": "^8.4.38",
+    "postcss-pxtorem": "^6.1.0",
+    "tailwindcss": "^3.4.3",
+    "vite": "^6.3.5",
+    "vite-plugin-svg-icons": "^2.0.1"
+  }
+}
