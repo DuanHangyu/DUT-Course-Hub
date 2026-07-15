@@ -41,8 +41,6 @@ export default defineConfig(({ mode, command }) => {
       // open: true,
       proxy: {
         "/dev-api": {
-          // target: "https://digital-test.hotsupper.top/digital/",
-          // target: "https://teach.deepolylink.com/digital/",
           target: "https://teach.deepolylink.com/digital/",
           changeOrigin: true,
           rewrite: (p) => p.replace(/^\/dev-api/, ""),

@@ -12,8 +12,6 @@ export default defineConfig(({ mode, command }) => {
       host: true,
       proxy: {
         "/dev-api": {
-          // target: "https://digital-student-test.hotsupper.top/digital/",
-          // target: "https://learn.deepolylink.com/digital",
           target: "https://learn.deepolylink.com/digital",
           changeOrigin: true,
           secure: false,
